@@ -3,8 +3,13 @@ import InstructionsModal from "./InstructionsModal";
 import "./style.css";
 import { getRule } from "../evaluationFunctions";
 import { useAppContext } from '../AppContext';
+import { useNavigate } from 'react-router-dom';
+
 
 const GuessingPhase = () => {
+    const navigate = useNavigate();
+    const { sharedData, setSharedData } = useAppContext();
+
     // State to show instructions modal
     const [showInstructions, setShowInstructions] = useState(false);
     // Contents of input fields
@@ -16,7 +21,7 @@ const GuessingPhase = () => {
     ]);
     // TODO: Add a mechanism to select the rule
     const [currentRule, setCurrentRule] = useState("Increase by 1");
-    const [currentEvalFunction, setCurrentEvalFunction] = useState(getRule(currentRule));
+    // const [currentEvalFunction, setCurrentEvalFunction] = useState(getRule(currentRule));
 
     // State to show rule guessing content on the left panel
     const [isRuleGuessingOpen, setIsRuleGuessingOpen] = useState(false);
@@ -67,7 +72,19 @@ const GuessingPhase = () => {
 
         // Redirect to the feedback page
         // Ensure that the userGuesses state carries over to the feedback page
-        window.location.href = "/feedback";
+        // const { sharedData, setSharedData } = useAppContext();
+
+        // const newUserGuesses = [...sharedData.userGuesses, { sequence: currentSequence.join(", "), hypothesis, matchesRule: result }];
+        // setSharedData({ ...sharedData, userGuesses: newUserGuesses });
+
+        // Opposed to the above 2 lines, I want the shared data to contain the userGuesses state, with no regard of previous states
+        // setSharedData({ userGuesses: [...userGuesses] });
+        setSharedData({ ...sharedData, userGuesses: userGuesses });
+
+
+        // window.location.href = "/feedback";
+        navigate("/feedback");
+
     };
 
     return (
