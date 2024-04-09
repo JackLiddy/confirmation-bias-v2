@@ -71,7 +71,7 @@ var ruleDict = {
     "Square of previous number": sqareOfPrevious,
 };
 
-// export a function that takes in a rule name and returns the corresponding function
+// Exported function that takes in a rule name and returns the corresponding function
 export function getRule(ruleName) {
     return ruleDict[ruleName];
 }

@@ -11,9 +11,11 @@ const GuessingPhase = () => {
     const [hypothesis, setHypothesis] = useState("");
     // State to store guesses, comprised of sequences and hypotheses
     const [userGuesses, setUserGuesses] = useState([
-        { sequence: "2, 4, 6", hypothesis: "(Initially provided match)", matchesRule: "TRUE✅" }
+        { sequence: [2, 4, 6], hypothesis: "(Initially provided match)", matchesRule: "TRUE✅" }
     ]);
-    const [currentEvalFunction, setCurrentEvalFunction] = useState(getRule("Increase by 1"));
+    // TODO: Add a mechanism to select the rule
+    const [currentRule, setCurrentRule] = useState("Increase by 1");
+    const [currentEvalFunction, setCurrentEvalFunction] = useState(getRule(currentRule));
 
     // Change the current sequence upon input change
     const handleSequenceChange = (index, value) => {
@@ -29,22 +31,26 @@ const GuessingPhase = () => {
 
     // TODO: Implement sequence guessing
     const submitSequenceGuess = () => {
+
+        // Ensure the currentEvalFunction is updated with the currentRule
+        const rule = currentRule;
+        const evalFunction = getRule(rule);
+
+        // get current sequence
+        const sequence = currentSequence;
+        // convert to integers
+        const sequenceInts = sequence.map(Number);
+
+        // Call the current evaluation function with the current sequence and log the result
+        const result = evalFunction(sequenceInts[0], sequenceInts[1], sequenceInts[2]);
+        const resultString = result ? "TRUE✅" : "FALSE❌";
+
         // Add the current sequence and hypothesis to the sequenceData state
-        setUserGuesses([...userGuesses, { sequence: currentSequence.join(", "), hypothesis }]);
+        setUserGuesses([...userGuesses, { sequence: currentSequence.join(", "), hypothesis, matchesRule: resultString }]);
         // Empty the current sequence and hypothesis states
         setCurrentSequence(["", "", ""]);
         setHypothesis("");
     };
-
-    useEffect(() => {
-        // console.log("Sequence input changed:", sequence);
-        console.log(getRule("Increase by 1"));
-
-        // Fetch the given function "Increase by 1"
-        const currentEvalFunction = getRule("Increase by 1");
-        // Call the function with the current sequence and log the result
-        console.log(currentEvalFunction(1, 2, 3));
-    }, [currentSequence]);
 
     return (
         <div className="guessing-phase-container">
