@@ -74,18 +74,16 @@ button:hover {
 /* CSS for the sequence grid */
 .sequence-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Now 4 columns */
-    gap: 10px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(4, 1fr);
 }
 
 .sequence-grid-item {
     padding: 5px;
-    border: 1px solid #555;
+    border: 1px solid white;
     text-align: center;
-    background-color: #222;
     color: #fff;
-    border-radius: 4px;
+    background-color: #6D39A8;
+    color: white;
 }
 
 /* Add styles for the help button */

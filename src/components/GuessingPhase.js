@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import InstructionsModal from "./InstructionsModal";
 import "./style.css";
 import { getRule } from "../evaluationFunctions";
+import { useAppContext } from '../AppContext';
 
 const GuessingPhase = () => {
     // State to show instructions modal
     const [showInstructions, setShowInstructions] = useState(false);
     // Contents of input fields
-    const [currentSequence, setCurrentSequence] = useState(["", "", ""]);
-    const [hypothesis, setHypothesis] = useState("");
+    const [currentSequence, setCurrentSequence] = useState(["1", "2", "3"]);
+    const [hypothesis, setHypothesis] = useState("Test hypothesis");
     // State to store guesses, comprised of sequences and hypotheses
     const [userGuesses, setUserGuesses] = useState([
         { sequence: [2, 4, 6], hypothesis: "(Initially provided match)", matchesRule: "TRUE✅" }
@@ -16,6 +17,9 @@ const GuessingPhase = () => {
     // TODO: Add a mechanism to select the rule
     const [currentRule, setCurrentRule] = useState("Increase by 1");
     const [currentEvalFunction, setCurrentEvalFunction] = useState(getRule(currentRule));
+
+    // State to show rule guessing content on the left panel
+    const [isRuleGuessingOpen, setIsRuleGuessingOpen] = useState(false);
 
     // Change the current sequence upon input change
     const handleSequenceChange = (index, value) => {
@@ -26,11 +30,13 @@ const GuessingPhase = () => {
 
     // TODO: Implement rule guessing
     const openRuleGuessing = () => {
-        console.log("Opening rule guessing");
+        // Set state to true to show rule guessing content on the left panel
+        setIsRuleGuessingOpen(true);
     };
 
     // TODO: Implement sequence guessing
-    const submitSequenceGuess = () => {
+    const submitSequenceGuess = (event) => {
+        event.preventDefault(); // Prevent form from submitting and refreshing the page
 
         // Ensure the currentEvalFunction is updated with the currentRule
         const rule = currentRule;
@@ -43,13 +49,25 @@ const GuessingPhase = () => {
 
         // Call the current evaluation function with the current sequence and log the result
         const result = evalFunction(sequenceInts[0], sequenceInts[1], sequenceInts[2]);
-        const resultString = result ? "TRUE✅" : "FALSE❌";
 
         // Add the current sequence and hypothesis to the sequenceData state
-        setUserGuesses([...userGuesses, { sequence: currentSequence.join(", "), hypothesis, matchesRule: resultString }]);
+        setUserGuesses([...userGuesses, { sequence: currentSequence.join(", "), hypothesis, matchesRule: result }]);
+
         // Empty the current sequence and hypothesis states
         setCurrentSequence(["", "", ""]);
         setHypothesis("");
+    };
+
+    // Implement submitFinalGuess
+    const submitFinalGuess = (event) => {
+        event.preventDefault();
+
+        // Display a message to the user
+        console.log("Final guess submitted");
+
+        // Redirect to the feedback page
+        // Ensure that the userGuesses state carries over to the feedback page
+        window.location.href = "/feedback";
     };
 
     return (
@@ -57,49 +75,74 @@ const GuessingPhase = () => {
             {showInstructions && (
                 <InstructionsModal onClose={() => setShowInstructions(false)} />
             )}
-            <div className="left-panel">
-                <div className="sequence-input-container">
-                    <label>Test a sequence of three integers</label>
-                    <div className="sequence-inputs">
-                        {currentSequence.map((number, index) => (
+            <form onSubmit={isRuleGuessingOpen ? submitFinalGuess : submitSequenceGuess} className="left-panel">
+                {!isRuleGuessingOpen ? (
+                    <>
+                        <div className="sequence-input-container">
+                            <label>Test a sequence of three integers</label>
+                            <div className="sequence-inputs">
+                                {currentSequence.map((number, index) => (
+                                    <input
+                                        key={index}
+                                        type="number"
+                                        value={number}
+                                        onChange={(e) =>
+                                            handleSequenceChange(index, e.target.value)
+                                        }
+                                        required
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="hypothesis-input-container">
+                            <label>What is the hypothesis for your sequence?</label>
                             <input
-                                key={index}
-                                type="number"
-                                value={number}
-                                onChange={(e) =>
-                                    handleSequenceChange(index, e.target.value)
-                                }
+                                type="text"
+                                value={hypothesis}
+                                onChange={(e) => setHypothesis(e.target.value)}
+                                required
                             />
-                        ))}
+                        </div>
+                        <div className="buttons-container">
+                            <button type="button" onClick={openRuleGuessing}>Guess the Rule!</button>
+                            <button type="submit">
+                                Test the Sequence!
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <div className="rule-guessing-panel">
+                        <div className="hypothesis-input-container">
+                            <label>What is your guess for my rule?</label>
+                            <input
+                                type="text"
+                                // value={currentRule}
+                                // onChange={(e) => setCurrentRule(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="buttons-container">
+                            <button type="submit">Submit Final Guess</button>
+                            <button type="button" onClick={() => setIsRuleGuessingOpen(false)}>Actually, I want to test more sequences</button>
+
+                        </div>
                     </div>
-                </div>
-                <div className="hypothesis-input-container">
-                    <label>What is the hypothesis for your sequence?</label>
-                    <input
-                        type="text"
-                        value={hypothesis}
-                        onChange={(e) => setHypothesis(e.target.value)}
-                    />
-                </div>
-                <div className="buttons-container">
-                    <button onClick={openRuleGuessing}>Guess the Rule!</button>
-                    <button onClick={submitSequenceGuess}>
-                        Test the Sequence!
-                    </button>
-                </div>
-            </div>
+                )}
+            </form>
             <div className="right-panel">
                 <div className="grid">
-                    {/* <label>Sequence Grid here</label> */}
                     <div className="sequence-output-value">
-                        {/* Display sequence data as a grid */}
                         <div className="sequence-grid">
+                            <div className="sequence-grid-item"><strong>#</strong></div>
+                            <div className="sequence-grid-item"><strong>Sequence</strong></div>
+                            <div className="sequence-grid-item"><strong>Hypothesis</strong></div>
+                            <div className="sequence-grid-item"><strong>Matches Rule</strong></div>
                             {userGuesses.map((data, index) => (
                                 <React.Fragment key={index}>
                                     <div className="sequence-grid-item">{index + 1}</div>
                                     <div className="sequence-grid-item">{data.sequence}</div>
                                     <div className="sequence-grid-item">{data.hypothesis}</div>
-                                    <div className="sequence-grid-item">{data.matchesRule}</div>
+                                    <div className="sequence-grid-item">{data.matchesRule ? "TRUE✅" : "FALSE❌"}</div>
                                 </React.Fragment>
                             ))}
                         </div>

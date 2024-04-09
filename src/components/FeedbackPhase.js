@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import InstructionsModal from './InstructionsModal';
 
 const FeedbackPhase = () => {
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   return (
     <div>
