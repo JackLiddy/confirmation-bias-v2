@@ -156,7 +156,7 @@ const GuessingPhase = () => {
                             <div className="sequence-grid-item"><strong>Matches Rule</strong></div>
                             {userGuesses.map((data, index) => (
                                 <React.Fragment key={index}>
-                                    <div className="sequence-grid-item">{index + 1}</div>
+                                    <div className="sequence-grid-item">{index === 0 ? '-' : index}</div>
                                     <div className="sequence-grid-item">{data.sequence}</div>
                                     <div className="sequence-grid-item">{data.hypothesis}</div>
                                     <div className="sequence-grid-item">{data.matchesRule ? "TRUE✅" : "FALSE❌"}</div>
